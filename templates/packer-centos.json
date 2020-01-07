@@ -1,0 +1,37 @@
+{
+  "variables": {
+    "centos_version": "7.7",
+    "build_number": "{{timestamp}}",
+    "centos_arch": "x86_64",
+    "headless": "true",
+    "workspace": "{{ env `WORKSPACE` }}",
+    "access_token": "{{ env `VAGRANT_CLOUD_ACCESS_TOKEN` }}",
+    "box_version": "1.15.0"
+  },
+  "builders": [{
+    "communicator": "ssh",
+    "source_path": "centos/7",
+    "provider": "virtualbox",
+    "add_force": true,
+    "type": "vagrant",
+    "template": "templates/Vagrantfile",
+    "output_dir": "{{ user `workspace` }}"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "scripts": [
+      "scripts/update.sh",
+      "scripts/editors.sh",
+      "scripts/pdk.sh",
+      "scripts/cleanup.sh"
+    ]
+  }],
+  "post-processors": [
+    {
+      "type": "vagrant-cloud",
+      "box_tag": "jmangt/centos-pdk",
+      "access_token": "{{ user `access_token` }}",
+      "version": "{{ user `box_version` }}"
+    }
+  ]
+}

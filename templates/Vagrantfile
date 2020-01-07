@@ -1,0 +1,23 @@
+Vagrant.configure("2") do |config|
+    config.vm.define "source", autostart: false do |source|
+      source.vm.box = "{{.SourceBox}}"
+      config.ssh.insert_key = {{.InsertKey}}
+    end
+    config.vm.define "output" do |output|
+      output.vm.box = "{{.BoxName}}"
+      output.vm.box_url = "file://package.box"
+      config.ssh.insert_key = {{.InsertKey}}
+    end
+    {{ if ne .SyncedFolder "" -}}
+            config.vm.synced_folder "{{.SyncedFolder}}", "/vagrant"
+    {{- else -}}
+            config.vm.synced_folder ".", "/vagrant", disabled: true
+    {{- end}}
+
+    # set auto_update to false, if you do NOT want to check the correct 
+    # additions version when booting this machine
+    config.vbguest.auto_update = false
+  
+    # do NOT download the iso file from a webserver
+    config.vbguest.no_remote = true
+end
